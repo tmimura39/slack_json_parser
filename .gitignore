@@ -1,7 +1,7 @@
 input/*
 output/*
 
-!.gitkeep
+!*.css
 
 .DS_Store
 *.swp
