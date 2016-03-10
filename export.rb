@@ -1,20 +1,14 @@
 require 'json'
 require 'erb'
-
-class User
-  attr_reader :id, :name, :image
-
-  def initialize(id, name, image)
-    @id = id
-    @name = name
-    @image = image
-  end
-end
+require 'open-uri'
 
 users = []
 open('./input/users.json') do |io|
   JSON.load(io).each do |user|
-    users << User.new(user['id'], user['name'], user['profile']['image_192'])
+    File.open("./output/images/#{user['id']}.png", 'w') do |file|
+      file.write(open(user['profile']['image_192']).read)
+    end
+    users << { id: user['id'], name: user['name'] }
   end
 end
 
