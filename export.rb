@@ -25,10 +25,11 @@ end
 
 channels.each do |channel|
   File.open("./output/#{channel}.html", 'w') do |file|
+    file.write(ERB.new(File.read('templates/sidebar.erb')).result(binding))
     Dir["./input/#{channel}/*.json"].each do |json|
       open(json) do |io|
         messages = JSON.load(io)
-        file.write(ERB.new(File.read('template.erb')).result(binding))
+        file.write(ERB.new(File.read('templates/content.erb')).result(binding))
       end
     end
   end
