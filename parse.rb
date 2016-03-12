@@ -17,16 +17,20 @@ FileUtils.mkdir_p(output_dir + 'images')
 assets = %w(templates/bootstrap.min.css templates/simple-sidebar.css)
 FileUtils.cp(assets, output_dir)
 
+print 'import image'
 users = []
 open(input_dir + 'users.json') do |io|
   users = JSON.load(io).map do |user|
     File.open(output_dir + 'images' + "#{user['id']}.png", 'w') do |file|
       file.write(open(user['profile']['image_192']).read)
     end
+    print '.'
     { id: user['id'], name: user['name'] }
   end
 end
+print "\n"
 
+print 'parse json'
 channels = []
 open(input_dir + 'channels.json') do |io|
   channels = JSON.load(io).map { |channel| channel['name'] }
@@ -42,4 +46,6 @@ channels.each do |channel|
       end
     end
   end
+  print '.'
 end
+print "\n"
