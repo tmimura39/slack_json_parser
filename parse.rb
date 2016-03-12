@@ -41,7 +41,17 @@ channels.each do |channel|
     file.write(ERB.new(File.read('templates/sidebar.erb')).result(binding))
     Dir[input_dir + channel + '*.json'].each do |json|
       open(json) do |io|
-        messages = JSON.load(io)
+        messages = JSON.load(io).each do |message|
+          if message['text']
+            message['text'].delete!('<>')
+            message['text'].gsub!(/(\r\n|\r|\n)/, '<br />')
+            message['text'].gsub!(/@.{9}/) do |mention|
+              user = users.find { |user| user[:id] == mention.delete('@') }
+              "@#{user[:name]}" if user
+            end
+          end
+          message[:user] = users.find { |user| user[:id] == message['user'] }
+        end
         file.write(ERB.new(File.read('templates/content.erb')).result(binding))
       end
     end

@@ -1,15 +1,14 @@
 <link href="bootstrap.min.css" rel="stylesheet" type="text/css">
 <% messages.each do |message| %>
-  <% user = users.find { |user| user[:id] == message["user"] } %>
   <ul class="media-list">
     <li class="media">
-    <% unless user.nil? %>
-      <a class="pull-left" href="#"><img class="media-object img-rounded" src="./images/<%= user[:id] %>.png" height="64" width="64"></a>
+    <% if message[:user] %>
+      <a class="pull-left" href="#"><img class="media-object img-rounded" src="./images/<%= message[:user][:id] %>.png" height="64" width="64"></a>
     <% end %>
       <div class="media-body">
-        <span class="h4 media-heading"><%= user ? user[:name] : "" %></span>
-        <span><%= Time.at(message["ts"].to_i).strftime("%Y-%m-%d %H:%M:%S") %></span>
-        <p><%= message["text"] ? message["text"].delete("<>").gsub(/(\r\n|\r|\n)/, "<br />") : "" %></p>
+        <span class="h4 media-heading"><%= message[:user] ? message[:user][:name] : "" %></span>
+        <span><%= Time.at(message['ts'].to_i).strftime("%Y-%m-%d %H:%M:%S") %></span>
+        <p><%= message['text'] ? message['text'] : "" %></p>
       </div>
     </li>
   </ul>
