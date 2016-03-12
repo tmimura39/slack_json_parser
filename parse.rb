@@ -1,26 +1,41 @@
 require 'json'
 require 'erb'
 require 'open-uri'
+require 'pathname'
+require 'fileutils'
+
+default_input_dir = Pathname('./input/')
+default_output_dir = Pathname('./output/')
+
+team_name = Dir['./input/*'].first.sub(/#{default_input_dir}/, '')
+
+input_dir = default_input_dir + team_name
+output_dir = default_output_dir + team_name
+
+FileUtils.mkdir_p(output_dir + 'images')
+
+assets = %w(templates/bootstrap.min.css templates/simple-sidebar.css)
+FileUtils.cp(assets, output_dir)
 
 users = []
-open('./input/users.json') do |io|
-  JSON.load(io).each do |user|
-    File.open("./output/images/#{user['id']}.png", 'w') do |file|
+open(input_dir + 'users.json') do |io|
+  users = JSON.load(io).map do |user|
+    File.open(output_dir + 'images' + "#{user['id']}.png", 'w') do |file|
       file.write(open(user['profile']['image_192']).read)
     end
-    users << { id: user['id'], name: user['name'] }
+    { id: user['id'], name: user['name'] }
   end
 end
 
 channels = []
-open('./input/channels.json') do |io|
+open(input_dir + 'channels.json') do |io|
   channels = JSON.load(io).map { |channel| channel['name'] }
 end
 
 channels.each do |channel|
-  File.open("./output/#{channel}.html", 'w') do |file|
+  File.open(output_dir + "#{channel}.html", 'w') do |file|
     file.write(ERB.new(File.read('templates/sidebar.erb')).result(binding))
-    Dir["./input/#{channel}/*.json"].each do |json|
+    Dir[input_dir + channel + '*.json'].each do |json|
       open(json) do |io|
         messages = JSON.load(io)
         file.write(ERB.new(File.read('templates/content.erb')).result(binding))
